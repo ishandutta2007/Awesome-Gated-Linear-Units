@@ -1,5 +1,7 @@
-# Awesome-Gated-Linear-Units
-## Gated Linear Units (GLUs) in AI: History, Progression, Variants, & Applications
+![Banner](assets/banner.svg)
+
+# 🚀 Awesome-Gated-Linear-Units 🌟
+## 🧠 Gated Linear Units (GLUs) in AI: History, Progression, Variants, & Applications
 
 A **Gated Linear Unit (GLU)** is an architectural neural network layer and non-linear activation mechanism designed to control the flow of information through deep neural networks using a parameterized gating block. First mathematically formalized by Yann N. Dauphin et al. in 2017 ("Language Modeling with Gated Linear Units"), GLUs replace traditional scalar activation functions (such as ReLU, GELU, or Swish) with an element-wise multiplication of two parallel linear projections, where one projection acts as a dynamic multiplier ("gate") over the other. 
 
@@ -7,7 +9,7 @@ By modeling non-linearities through data-dependent multiplicative interactions r
 
 ---
 
-## 1. The Macro Chronological Evolution
+## 🕰️ 1. The Macro Chronological Evolution
 
 The technical implementation of gating activations has transitioned from rigid multi-step LSTM gates to flat linear convolutional gating, moving toward smooth, non-linear Swish and GELU transformer projection blocks.
 
@@ -31,7 +33,7 @@ flowchart LR
 
 ---
 
-## 2. Core Functional & Algorithmic Variants
+## 🧬 2. Core Functional & Algorithmic Variants
 
 The Gated Linear Unit family tree is strictly categorized based on the specific mathematical activation functions applied to the gating projection branch.
 
@@ -45,7 +47,7 @@ The Gated Linear Unit family tree is strictly categorized based on the specific 
 
 ---
 
-## 3. The SwiGLU FFN Layer Matrix
+## 🧮 3. The SwiGLU FFN Layer Matrix
 
 To implement SwiGLU layers inside a Transformer's Feed-Forward Network (FFN) block without increasing computing latencies, architectures expand parameter columns to execute single-pass matrix fusions.
 
@@ -79,7 +81,7 @@ flowchart TB
 
 ---
 
-## 4. Production Engineering Challenges & Hardware Solutions
+## ⚙️ 4. Production Engineering Challenges & Hardware Solutions
 
 Deploying and scaling complex GLU-based parallel architectures across large-scale distributed training clusters introduces unique VRAM memory and kernel execution constraints.
 
@@ -91,7 +93,7 @@ Deploying and scaling complex GLU-based parallel architectures across large-scal
 
 ---
 
-## 5. Frontier Real-World AI Industrial Applications
+## 🏭 5. Frontier Real-World AI Industrial Applications
 
 | Application | Description | Year | Paper | Details |
 |---|---|---|---|---|
@@ -102,7 +104,7 @@ Deploying and scaling complex GLU-based parallel architectures across large-scal
 
 ---
 
-## References
+## 📚 References
 1. Dauphin, Y. N., et al. (2017). Language modeling with gated linear units. *Proceedings of the 34th International Conference on Machine Learning (ICML)*, 933-1141.
 2. Hendrycks, D., & Gimpel, K. (2016). Gaussian error linear units (GELUs). *arXiv preprint arXiv:1606.08415*.
 3. Ramachandran, P., Zoph, B., & Le, Q. V. (2017). Searching for activation functions (Swish/SiLU). *arXiv preprint arXiv:1710.05941*.
@@ -119,7 +121,7 @@ To advance this section of your repository, structural framework setup, or post-
 
 ***
 
-**Follow-Up Options Matrix:**
+🛠️ **Follow-Up Options Matrix:**
 
 Before updating this documentation repository layout, let me know how you would like to proceed by choosing one of the options below:
 * I can provide a **complete Python code boilerplate using PyTorch** demonstrating how to write an automated script that packs SwiGLU gate and up-projection weights into a single unified tensor layout.
