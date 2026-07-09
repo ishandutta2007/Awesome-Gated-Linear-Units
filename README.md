@@ -134,3 +134,15 @@ Before updating this documentation repository layout, let me know how you would 
 * I can write a detailed technical explanation focusing on the **mathematical derivation of gradient propagation bounds** through a SwiGLU layer, explaining why it eliminates the dead-neuron optimization problem typical of hard threshold functions.
 
 
+
+
+##  Star History
+<div align="center">
+<a href="https://www.star-history.com/?repos=ishandutta2007%2FAwesome-Gated-Linear-Units&type=date&legend=bottom-right">
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=ishandutta2007/Awesome-Gated-Linear-Units&type=date&theme=dark&legend=bottom-right" />
+<source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=ishandutta2007/Awesome-Gated-Linear-Units&type=date&legend=bottom-right" />
+<img alt="Star History Chart" src="https://api.star-history.com/chart?repos=ishandutta2007/Awesome-Gated-Linear-Units&type=date&legend=bottom-right" />
+</picture>
+</a>
+</div>
