@@ -21,18 +21,13 @@ flowchart LR
 ```
 
 
-*   **The Sequential Recurrent Gating Era (LSTM / GRU, ~1997–2017)**
-    *   *Concept:* The historical baseline of gated neural networks. Recurrent cells like **Long Short-Term Memory (LSTM)** architectures introduced explicit input, forget, and output gates to create a linear memory highway.
-    *   *Limitation:* Catastrophically memory-bandwidth bound and non-parallelizable. Because recurrent step $t+1$ depends strictly on step $t$ finishing, the gating computations could not scale efficiently across parallel GPU clusters during training.
-*   **The Flat Convolutional Gating Revolution (Vanilla GLU, Dauphin et al., 2017)**
-    *   *Concept:* Ported gating mechanics out of recurrent dependencies and straight into parallelizable convolutional networks. Dauphin et al. split a layer's projection matrix into two parallel paths: one path is mapped via a standard linear layer, while the twin path passes through a Sigmoid activation function ($\sigma$) to function as a bounded gating array $[0, 1]$. The paths are combined via an element-wise product ($\otimes$).
-    *   *Significance:* Allowed the entire gating sequence to parallelize cleanly across GPU arrays, dropping training times significantly while outperforming traditional recurrent language models on large-scale text corpuses.
-*   **The Smooth Non-Linear Projection Era (SwiGLU / GeGLU, Shazeer, 2020)**
-    *   *Concept:* Perfected gating mechanics for Transformer architectures by replacing the flat Sigmoid operator with state-of-the-art smooth, non-linear activation functions. Noam Shazeer (Google Shay) introduced the **SwiGLU** and **GeGLU** variants. Instead of a linear gate, the gating branch is wrapped inside a **Swish/SilU** or **GELU** activation curve before executing the element-wise multiplication step.
-    *   *Significance:* Became the undisputed architectural default standard underpining modern high-performance foundation models (such as Llama 3 and Mistral), delivering major perplexity and convergence gains out-of-the-box.
-*   **The Fused Latent Parallel MoE Era (~2024–Present)**
-    *   *Concept:* The current modern state-of-the-art foundation infrastructure standard. It ports SwiGLU gating out of dense multi-layer networks and straight into sparsely routed architectures (such as DeepSeek-V3). 
-    *   *Significance:* It merges SwiGLU FFN structures natively inside **Mixture-of-Experts (MoE)** blocks. The input gating projections, up-scaling matrices, and expert-routing column allocations are calculated concurrently inside fast GPU SRAM registers, maximizing cluster parameter density while bypassing global memory bus loops.
+| Era / Concept | Description | Year | Paper | Details |
+|---|---|---|---|---|
+| The Sequential Recurrent Gating Era (LSTM / GRU) | The historical baseline of gated neural networks. Recurrent cells like LSTM introduced explicit input, forget, and output gates to create a linear memory highway. | 1997 | [Hochreiter & Schmidhuber, 1997](https://doi.org/10.1162/neco.1997.9.8.1735) | [Read more](LSTM-GRU.md) |
+| The Flat Convolutional Gating Revolution (Vanilla GLU) | Ported gating mechanics out of recurrent dependencies and straight into parallelizable convolutional networks. Dauphin et al. split a layer's projection matrix into two parallel paths. | 2017 | [Dauphin et al., 2017](https://arxiv.org/abs/1612.08083) | [Read more](Vanilla-GLU.md) |
+| The Smooth Non-Linear Projection Era (SwiGLU / GeGLU) | Perfected gating mechanics for Transformer architectures by replacing the flat Sigmoid operator with state-of-the-art smooth, non-linear activation functions. | 2020 | [Shazeer, 2020](https://arxiv.org/abs/2002.05202) | [Read more](SwiGLU-GeGLU.md) |
+| The Fused Latent Parallel MoE Era | The current modern state-of-the-art foundation infrastructure standard. It ports SwiGLU gating out of dense multi-layer networks and straight into sparsely routed architectures. | 2024 | [DeepSeek-AI, 2024](https://arxiv.org/abs/2401.06066) | [Read more](Fused-Latent-Parallel-MoE.md) |
+
 
 ---
 
@@ -40,26 +35,13 @@ flowchart LR
 
 The Gated Linear Unit family tree is strictly categorized based on the specific mathematical activation functions applied to the gating projection branch.
 
-- ### A. Vanilla GLU (Sigmoid-Gated Linear)
-	*   **Mechanism:** Multiplies a linear projection $xW + b$ by the Sigmoid transformation of a parallel projection $xV + c$:
-	    $$\text{GLU}(x, W, V, b, c) = (xW + b) \otimes \sigma(xV + c)$$
-	*   **Behavior:** The Sigmoid function acts as a soft binary switch, dynamically dampening or amplifying signals based on data context.
+| Variant | Mechanism / Pros | Year | Paper | Details |
+|---|---|---|---|---|
+| A. Vanilla GLU (Sigmoid-Gated Linear) | Multiplies a linear projection by the Sigmoid transformation of a parallel projection. The Sigmoid function acts as a soft binary switch. | 2017 | [Dauphin et al., 2017](https://arxiv.org/abs/1612.08083) | [Read more](Vanilla-GLU-Variant.md) |
+| B. SwiGLU (Swish/SiLU Gated Linear) | Replaces the Sigmoid operator with the Swish activation function, omitting the bias terms to streamline hardware execution. | 2020 | [Shazeer, 2020](https://arxiv.org/abs/2002.05202) | [Read more](SwiGLU-Variant.md) |
+| C. GeGLU (GELU Gated Linear) | Leverages the Gaussian Error Linear Unit (GELU) to modulate the gating pathway. | 2020 | [Shazeer, 2020](https://arxiv.org/abs/2002.05202) | [Read more](GeGLU-Variant.md) |
+| D. ReGLU (ReLU Gated Linear) | Uses a simple rectified linear unit (ReLU) to shape the gating channel. Computationally cheaper than SwiGLU or GeGLU. | 2020 | [Shazeer, 2020](https://arxiv.org/abs/2002.05202) | [Read more](ReGLU-Variant.md) |
 
-- ### B. SwiGLU (Swish/SiLU Gated Linear)
-	*   **Mechanism:** Replaces the Sigmoid operator with the Swish (or Silicon Linear Unit - SiLU) activation function, omitting the bias terms to streamline hardware execution:
-	    $$\text{SwiGLU}(x, W, V) = \text{Swish}_\beta(xW) \otimes xV$$
-	    Where $\text{Swish}_\beta(x) = x \cdot \sigma(\beta x)$.
-	*   **Downstream Application:** The standard default FFN backbone configuration for almost all modern open-weight LLMs (e.g., Llama, Mistral, Qwen).
-
-- ### C. GeGLU (GELU Gated Linear)
-	*   **Mechanism:** Leverages the Gaussian Error Linear Unit (GELU) to modulate the gating pathway:
-	    $$\text{GeGLU}(x, W, V) = \text{GELU}(xW) \otimes xV$$
-	*   **Pros:** Highly popular in early multimodal and text-to-image architectures, providing clean gradient tracking through stochastic probability thresholds.
-
-- ### D. ReGLU (ReLU Gated Linear)
-	*   **Mechanism:** Uses a simple rectified linear unit (ReLU) to shape the gating channel:
-	    $$\text{ReGLU}(x, W, V) = \max(0, xW) \otimes xV$$
-	*   **Pros:** Computationally cheaper than SwiGLU or GeGLU because it avoids exponential calculations, though it sacrifices a fraction of modeling expressiveness due to the hard zero-boundary of ReLU.
 
 ---
 
@@ -89,10 +71,11 @@ flowchart TB
 ```
 
 
-*   **Fused Input Projection Kernels**
-    *   *Profile:* Collapses model memory lookups. To prevent launching two separate, sequential GPU kernel executions for the Gate path ($W$) and the Up path ($V$), the system stacks the matrices on disk as a single unified weight tensor, executing both projections in a single continuous hardware step inside fast registers.
-*   **The $3d_{\text{ffn}}$ Column Scaling Matrix**
-    *   *Profile:* Manages parameter balancing. Standard FFN layers utilize two weight matrices ($2 \times d_{model} \times d_{\text{ffn}}$). Because a GLU block splits the input step into two parallel matrices ($W$ and $V$) before running the output down-projection ($W_o$), it requires three distinct weight matrices ($3 \times d_{model} \times d_{\text{ffn}}$). To maintain a fair compute comparison against dense baselines, infrastructure teams downscale the intermediate dimension hidden width down to approximately $\frac{2}{3} \times 4d_{model}$.
+| Component | Profile / Description | Year | Paper | Details |
+|---|---|---|---|---|
+| Fused Input Projection Kernels | Collapses model memory lookups. To prevent launching two separate, sequential GPU kernel executions for the Gate path and the Up path. | 2022 | [Dao et al., 2022 (FlashAttention)](https://arxiv.org/abs/2205.14135) | [Read more](Fused-Input-Projection-Kernels.md) |
+| The $3d_{\text{ffn}}$ Column Scaling Matrix | Manages parameter balancing. To maintain a fair compute comparison against dense baselines, intermediate dimension is downscaled. | 2020 | [Shazeer, 2020](https://arxiv.org/abs/2002.05202) | [Read more](3d-ffn-Column-Scaling-Matrix.md) |
+
 
 ---
 
@@ -100,23 +83,22 @@ flowchart TB
 
 Deploying and scaling complex GLU-based parallel architectures across large-scale distributed training clusters introduces unique VRAM memory and kernel execution constraints.
 
-*   **The FlashAttention Kernel Memory Allocation Gap**
-    *   *The Problem:* Fusing the input projections of parallel gating layers creates massive activation tensor fields inside the hidden layers. During large training batch passes, this causes intermediate activation memory to swell, bottlenecking global GPU memory bandwidth and triggering system-wide Out-of-Memory crashes.
-    *   *Mitigation:* Deploying custom **handwritten Triton or CUDA kernels** that handle the SwiGLU element-wise multiplication and activation tracking natively within fast, on-chip GPU SRAM registers, evicting non-boundary activation arrays immediately before global High Bandwidth Memory (HBM) storage occurs.
-*   **The Parameter-Heterogeneity Expert Load-Imbalance Wall**
-    *   *The Problem:* When sharding a model's parallel GLU layers across a **Tensor Parallelism (TP)** or sparse Mixture-of-Experts group, column-parallel allocations must balance processing steps perfectly. If data routing dispatches highly complex token streams to a single expert node irregularly, that node bottlenecks the cluster, forcing all other GPUs to sit idle in dead wait cycles.
-    *   *Mitigation:* Implementing **Device-Aware Topology Routing**, group-partitioning expert data layouts to match high-speed intra-node NVLink lanes, coupled with token-dropping heuristics to clamp maximum cluster communication payloads.
+| Challenge | Problem & Mitigation | Year | Paper | Details |
+|---|---|---|---|---|
+| The FlashAttention Kernel Memory Allocation Gap | Fusing the input projections creates massive activation tensor fields... Mitigated by deploying custom handwritten Triton or CUDA kernels. | 2022 | [Dao et al., 2022](https://arxiv.org/abs/2205.14135) | [Read more](FlashAttention-Kernel-Memory-Allocation-Gap.md) |
+| The Parameter-Heterogeneity Expert Load-Imbalance Wall | When sharding a model's parallel GLU layers, column-parallel allocations must balance processing steps perfectly. Mitigated by Device-Aware Topology Routing. | 2021 | [Fedus et al., 2021 (Switch Transformers)](https://arxiv.org/abs/2101.03961) | [Read more](Parameter-Heterogeneity-Expert-Load-Imbalance.md) |
+
 
 ---
 
 ## 5. Frontier Real-World AI Industrial Applications
 
-*   **Pre-Training Web-Scale Foundational LLM Suites (Llama / DeepSeek)**
-    *   *Application:* Serves as the standard default FFN activation backbone used to train elite base architectures. SwiGLU gating networks maximize parameter expressiveness over multi-trillion token corpuses, allowing models to internalize highly intricate mathematical log-probabilities, source code syntaxes, and multilingual rules with high data efficiency.
-*   **Low-Latency Real-Time Cloud Inference Serving Engines (vLLM Deployments)**
-    *   *Application:* Compresses model generation response latency within enterprise software endpoints. By replacing traditional sequential networks with parallelized, fused GLU architectures compiled via TensorRT-LLM, cloud providers compress **Time-to-First-Token (TTFT)** metrics significantly, boosting query concurrency thresholds cheaply.
-*   **Autonomous Vehicle Multimodal Bird's-Eye-View Perception**
-    *   *Application:* Ingests real-time streaming high-res camera video and LiDAR 3D coordinates concurrently. Deep vision-transformer or ConvNeXt backbones process visual patch grids through parallel GeGLU or SwiGLU layers, mapping spatial features stably into unified Bird's-Eye-View (BEV) coordinates to execute safe obstacle tracking.
+| Application | Description | Year | Paper | Details |
+|---|---|---|---|---|
+| Pre-Training Web-Scale Foundational LLM Suites (Llama / DeepSeek) | Serves as the standard default FFN activation backbone used to train elite base architectures. | 2023 | [Touvron et al., 2023 (Llama)](https://arxiv.org/abs/2302.13971) | [Read more](Pre-Training-Web-Scale-Foundational-LLMs.md) |
+| Low-Latency Real-Time Cloud Inference Serving Engines (vLLM Deployments) | Compresses model generation response latency within enterprise software endpoints. | 2023 | [Kwon et al., 2023 (vLLM)](https://arxiv.org/abs/2309.06180) | [Read more](Low-Latency-Real-Time-Cloud-Inference.md) |
+| Autonomous Vehicle Multimodal Bird's-Eye-View Perception | Ingests real-time streaming high-res camera video and LiDAR 3D coordinates concurrently. | 2022 | [Li et al., 2022 (BEVFormer)](https://arxiv.org/abs/2203.17270) | [Read more](Autonomous-Vehicle-Multimodal-BEV.md) |
+
 
 ---
 
