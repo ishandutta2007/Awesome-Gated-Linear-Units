@@ -1,7 +1,12 @@
 ![Banner](assets/banner.svg)
 
 # 🚀 Awesome-Gated-Linear-Units 🌟
-## 🧠 Gated Linear Units (GLUs) in AI: History, Progression, Variants, & Applications
+
+<div align="center">
+<a href="https://github.com/ishandutta2007/Awesome-Awesome-Awesome"><img src="https://img.shields.io/badge/Awesome-%E2%9C%94-blueviolet?style=flat-square&logo=github" alt="Awesome"/></a><a href="https://discord.gg/jc4xtF58Ve"><img src="https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Discord" /></a>
+</div>
+
+## 🧠 Gated Linear Units (GLUs) - Advanced Neural Network Architectures in AI: History, Progression, Variants, & Applications
 
 A **Gated Linear Unit (GLU)** is an architectural neural network layer and non-linear activation mechanism designed to control the flow of information through deep neural networks using a parameterized gating block. First mathematically formalized by Yann N. Dauphin et al. in 2017 ("Language Modeling with Gated Linear Units"), GLUs replace traditional scalar activation functions (such as ReLU, GELU, or Swish) with an element-wise multiplication of two parallel linear projections, where one projection acts as a dynamic multiplier ("gate") over the other. 
 
