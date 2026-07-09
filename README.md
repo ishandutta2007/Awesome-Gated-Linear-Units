@@ -14,7 +14,10 @@ The technical implementation of gating activations has transitioned from rigid m
 
 
 ```mermaid
-[Sequential LSTM Gating (1997)] ───> [Linear Convolutional GLU (Dauphin, 2017)] ───> [SwiGLU / GeGLU Blocks (Shazeer, 2020)] ───> [Fused Latent Expert Routing (Modern LLMs)](Non-Parallel CPU Data Bottlenecks)       (Flat Element-Wise Sigmoid Multipliers)         (Smooth Non-Linear Projection Paths)           (Hardware-Fused Gated Expert Columns)
+flowchart LR
+    A["Sequential LSTM Gating (1997) (Non-Parallel CPU Data Bottlenecks)"] --> B["Linear Convolutional GLU (Dauphin, 2017) (Flat Element-Wise Sigmoid Multipliers)"]
+    B --> C["SwiGLU / GeGLU Blocks (Shazeer, 2020) (Smooth Non-Linear Projection Paths)"]
+    C --> D["Fused Latent Expert Routing (Modern LLMs) (Hardware-Fused Gated Expert Columns)"]
 ```
 
 
@@ -66,7 +69,23 @@ To implement SwiGLU layers inside a Transformer's Feed-Forward Network (FFN) blo
 
 
 ```mermaid
-Standard Sequential FFN Layer[Input Hidden State x] ───> [Linear Layer 1] ───> [GELU Activation] ───> [Linear Layer 2] ───> [Output]SwiGLU Gated Parallel FFN Block┌──> [Weight Matrix W (Gate Path)] ──> [Swish Activation] ──┐[Input Hidden x] ─┤                                                       ├──> [Element-wise ⊗] ──> [Weight Matrix O] ──> [Output]└──> [Weight Matrix V (Up Path)] ───────────────────────────┘
+flowchart TB
+    subgraph Standard["Standard Sequential FFN Layer"]
+        A1["Input Hidden State x"] --> A2["Linear Layer 1"]
+        A2 --> A3["GELU Activation"]
+        A3 --> A4["Linear Layer 2"]
+        A4 --> A5["Output"]
+    end
+
+    subgraph SwiGLU["SwiGLU Gated Parallel FFN Block"]
+        B1["Input Hidden x"] --> B2["Weight Matrix W (Gate Path)"]
+        B1 --> B3["Weight Matrix V (Up Path)"]
+        B2 --> B4["Swish Activation"]
+        B4 --> B5{"Element-wise ⊗"}
+        B3 --> B5
+        B5 --> B6["Weight Matrix O"]
+        B6 --> B7["Output"]
+    end
 ```
 
 
